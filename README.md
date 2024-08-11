@@ -7,7 +7,7 @@
   git clone https://github.com/MS-Teja/CompareThePrice.git
   cd CompareThePrice
   ```
-
+&nbsp
 
 
 ## 2. Create a Virtual Environment:

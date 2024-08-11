@@ -36,11 +36,13 @@
   ```
   pip install -r requirements.txt
   ```
+
 &nbsp;
 &nbsp;
 
 ## 5. Install Node.js
   Ensure you have Node.js installed. You can download it from [Node.js official website](https://nodejs.org/).
+
 &nbsp;
 &nbsp;
 
@@ -51,6 +53,7 @@
   ```
 
   This will install all the dependencies listed in the `package.json`.
+
 &nbsp;
 &nbsp;
 
@@ -62,6 +65,7 @@
   ```
   python app.py
   ```
+
 &nbsp;
 
   ### For the Frontend (Node.js):
@@ -69,6 +73,8 @@
   ```
   npm run dev
   ```
+
 &nbsp;
 &nbsp;
+
   This will start the development server and you can view the project in your browser.

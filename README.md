@@ -66,8 +66,6 @@
   python app.py
   ```
 
-&nbsp;
-
   ### For the Frontend (Node.js):
   Ensure Node.js dependencies are installed, then run:
   ```

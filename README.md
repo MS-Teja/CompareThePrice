@@ -25,7 +25,7 @@
   ```
 
 ## 4. Install Dependencies:
-  Install the required dependencies from the [`requirements.txt`] file:
+  Install the required dependencies from the `requirements.txt` file:
   ```
   pip install -r requirements.txt
   ```

@@ -17,6 +17,12 @@
     <div v-else>
       <p>No products found.</p>
     </div>
+    <div>
+      <h2>Logs</h2>
+      <div v-for="(log, index) in logs" :key="index" class="log">
+        <p>{{ log }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -30,7 +36,11 @@ export default {
       searchQuery: '',
       flipkartPrice: '',
       amazonPrice: '',
-      errorMessage: ''
+      errorMessage: '',
+      logs: [],
+      maxLogs: 10, // Maximum number of logs to keep
+      logUpdateInterval: 100, // Interval to update logs (in milliseconds)
+      eventSource: null // Store the EventSource instance
     };
   },
   methods: {
@@ -38,6 +48,7 @@ export default {
       this.errorMessage = '';
       this.flipkartPrice = '';
       this.amazonPrice = '';
+      this.logs = []; // Clear logs before fetching prices
 
       try {
         const response = await axios.get('http://127.0.0.1:5000/compare', {
@@ -56,6 +67,29 @@ export default {
         this.errorMessage = 'An error occurred while fetching prices. Please try again later.';
         console.error('Error fetching prices:', error);
       }
+    },
+    async fetchLogs() {
+      const eventSource = new EventSource('http://127.0.0.1:5000/log');
+      let logBuffer = [];
+
+      eventSource.onmessage = (event) => {
+        logBuffer.push(event.data); // Add new log message to the log buffer
+      };
+
+      setInterval(() => {
+        if (logBuffer.length > 0) {
+          this.logs = logBuffer.slice(-this.maxLogs); // Update logs with the latest messages
+          logBuffer = []; // Clear the log buffer
+        }
+      }, this.logUpdateInterval);
+    }
+  },
+  mounted() {
+    this.fetchLogs();
+  },
+  beforeDestroy() {
+    if (this.eventSource) {
+      this.eventSource.close(); // Close the EventSource connection
     }
   }
 };
@@ -75,5 +109,12 @@ export default {
 
 .error {
   color: red;
+}
+
+.log {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #f9f9f9;
 }
 </style>

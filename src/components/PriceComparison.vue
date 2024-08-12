@@ -3,24 +3,20 @@
     <h1>Price Comparison</h1>
     <input v-model="searchQuery" placeholder="Search for a product" />
     <button @click="fetchPrices">Search</button>
+    <div>
+      <div v-for="(log, index) in logs" :key="index" class="log">
+        <p>{{ log }}</p>
+      </div>
+    </div>
     <div v-if="errorMessage">
       <p class="error">{{ errorMessage }}</p>
     </div>
-    <div v-else-if="flipkartPrice && amazonPrice">
+    <div v-else>
       <div class="product">
         <h2>Flipkart Price: {{ flipkartPrice }}</h2>
       </div>
       <div class="product">
         <h2>Amazon Price: {{ amazonPrice }}</h2>
-      </div>
-    </div>
-    <div v-else>
-      <p>No products found.</p>
-    </div>
-    <div>
-      <h2>Logs</h2>
-      <div v-for="(log, index) in logs" :key="index" class="log">
-        <p>{{ log }}</p>
       </div>
     </div>
   </div>
@@ -43,6 +39,7 @@ export default {
       eventSource: null // Store the EventSource instance
     };
   },
+
   methods: {
     async fetchPrices() {
       this.errorMessage = '';
@@ -55,19 +52,19 @@ export default {
           params: { query: this.searchQuery }
         });
 
-        if (response.data.flipkart_price === 'Not found' || response.data.amazon_price === 'Not found') {
-          this.errorMessage = `Product "${this.searchQuery}" not found on one or both platforms.`;
-        } else if (response.data.flipkart_price === 'Error' || response.data.amazon_price === 'Error') {
-          this.errorMessage = 'An error occurred while fetching prices.';
-        } else {
-          this.flipkartPrice = response.data.flipkart_price;
-          this.amazonPrice = response.data.amazon_price;
+        this.flipkartPrice = response.data.flipkart_price;
+        this.amazonPrice = response.data.amazon_price;
+
+        if (this.flipkartPrice === "Product not available" && this.amazonPrice === "Product not available") {
+          this.errorMessage = `Product "${this.searchQuery}" not found on both platforms.`;
         }
-      } catch (error) {
+      }
+      catch (error) {
         this.errorMessage = 'An error occurred while fetching prices. Please try again later.';
         console.error('Error fetching prices:', error);
       }
     },
+
     async fetchLogs() {
       const eventSource = new EventSource('http://127.0.0.1:5000/log');
       let logBuffer = [];
@@ -84,9 +81,11 @@ export default {
       }, this.logUpdateInterval);
     }
   },
+
   mounted() {
     this.fetchLogs();
   },
+
   beforeDestroy() {
     if (this.eventSource) {
       this.eventSource.close(); // Close the EventSource connection
@@ -96,25 +95,24 @@ export default {
 </script>
 
 <style scoped>
-.price-comparison {
-  text-align: center;
-  margin: 20px;
-}
+    .price-comparison {
+      text-align: center;
+      margin: 20px;
+    }
 
-.product {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin: 10px 0;
-}
+    .product {
+      /* padding: 5px; */
+      /* margin: 10px 0; */
+    }
 
-.error {
-  color: red;
-}
+    .error {
+      color: red;
+    }
 
-.log {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin: 10px 0;
-  background-color: #f9f9f9;
-}
+    /* .log {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #f9f9f9;
+    } */
 </style>

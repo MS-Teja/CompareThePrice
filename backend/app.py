@@ -153,8 +153,8 @@ def compare():
     amazon_price = get_amazon_price(query)
 
     return jsonify({
-        'flipkart_price': flipkart_price,
-        'amazon_price': amazon_price
+        'flipkart_price': flipkart_price if flipkart_price != "Not found" else "Product not available",
+        'amazon_price': amazon_price if amazon_price != "Not found" else "Product not available"
     })
 
 if __name__ == '__main__':

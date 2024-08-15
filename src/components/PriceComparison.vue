@@ -13,10 +13,10 @@
     </div>
     <div v-else>
       <div class="product">
-        <h2>Flipkart Price: {{ flipkartPrice }}</h2>
+        <h2>Flipkart Price: <a :href="flipkartUrl" target="_blank">{{ flipkartPrice }}</a></h2>
       </div>
       <div class="product">
-        <h2>Amazon Price: {{ amazonPrice }}</h2>
+        <h2>Amazon Price: <a :href="amazonUrl" target="_blank">{{ amazonPrice }}</a></h2>
       </div>
     </div>
   </div>
@@ -31,7 +31,9 @@ export default {
     return {
       searchQuery: '',
       flipkartPrice: '',
+      flipkartUrl: '',
       amazonPrice: '',
+      amazonUrl: '',
       errorMessage: '',
       logs: [],
       maxLogs: 10, // Maximum number of logs to keep
@@ -44,7 +46,9 @@ export default {
     async fetchPrices() {
       this.errorMessage = '';
       this.flipkartPrice = '';
+      this.flipkartUrl = '';
       this.amazonPrice = '';
+      this.amazonUrl = '';
       this.logs = []; // Clear logs before fetching prices
 
       try {
@@ -53,23 +57,27 @@ export default {
         });
 
         this.flipkartPrice = response.data.flipkart_price;
+        this.flipkartUrl = response.data.flipkart_url;
         this.amazonPrice = response.data.amazon_price;
+        this.amazonUrl = response.data.amazon_url;
+
+        console.log('Flipkart URL:', this.flipkartUrl);
+        console.log('Amazon URL:', this.amazonUrl);
 
         if (this.flipkartPrice === "Product not available" && this.amazonPrice === "Product not available") {
-          this.errorMessage = `Product "${this.searchQuery}" not found on both platforms.`;
+          this.errorMessage = `"${this.searchQuery}" not found on both platforms.`;
         }
-      }
-      catch (error) {
+      } catch (error) {
         this.errorMessage = 'An error occurred while fetching prices. Please try again later.';
         console.error('Error fetching prices:', error);
       }
     },
 
-    async fetchLogs() {
-      const eventSource = new EventSource('http://127.0.0.1:5000/log');
+    fetchLogs() {
+      this.eventSource = new EventSource('http://127.0.0.1:5000/log');
       let logBuffer = [];
 
-      eventSource.onmessage = (event) => {
+      this.eventSource.onmessage = (event) => {
         logBuffer.push(event.data); // Add new log message to the log buffer
       };
 
@@ -95,24 +103,19 @@ export default {
 </script>
 
 <style scoped>
-    .price-comparison {
-      text-align: center;
-      margin: 20px;
-    }
+.price-comparison {
+  text-align: center;
+  margin: 20px;
+}
 
-    .product {
-      /* padding: 5px; */
-      /* margin: 10px 0; */
-    }
+.error {
+  color: red;
+}
 
-    .error {
-      color: red;
-    }
-
-    /* .log {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin: 10px 0;
-      background-color: #f9f9f9;
-    } */
+/* .log {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #f9f9f9;
+} */
 </style>
